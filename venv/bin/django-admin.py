@@ -1,4 +1,4 @@
-#![REDACTED_AWS_SECRET_ACCESS_KEY]ject/venv/bin/python
+#![REDACTED_AWS_SECRET_ACCESS_KEY]-Downloader/venv/bin/python
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 
