@@ -21,6 +21,8 @@ def download_video(request):
             'quiet': True, # Suppress console output from yt-dlp
             'no_warnings': True, # Suppress warnings from yt-dlp
             'simulate': True, # Do not actually download, just extract info
+            'retries': 5, # Number of retries for network errors
+            'force_ipv4': True, # Force IPv4 to avoid potential IPv6 issues
         }
         
         try:
@@ -72,13 +74,18 @@ def download_video(request):
             return render(request, 'home.html', context)
         except Exception as error:
             # Safely encode the error message for printing to console/logs
-            # Replaces non-ASCII characters with XML character references
             safe_error_for_print = str(error).encode('ascii', 'xmlcharrefreplace').decode('ascii')
             print(f"Error during video info extraction: {safe_error_for_print}") # Log the full error for debugging
 
-            # Safely encode the error message for HttpResponse
-            # Replaces non-ASCII characters with XML character references
-            error_message_for_http = str(error.args[0]).encode('ascii', 'xmlcharrefreplace').decode('ascii') if error.args else "Could not extract video information. Please check the URL."
+            # Check for specific yt-dlp authentication error
+            error_message_str = str(error)
+            if "Sign in to confirm you’re not a bot" in error_message_str or "Use --cookies-from-browser or --cookies for the authentication" in error_message_str:
+                user_friendly_message = "This video requires authentication or is restricted. Our public downloader cannot access it. Please try a different video."
+            else:
+                user_friendly_message = "Could not extract video information. Please check the URL or try again later."
+            
+            # Safely encode the user-friendly message for HttpResponse
+            error_message_for_http = user_friendly_message.encode('ascii', 'xmlcharrefreplace').decode('ascii')
             return HttpResponse(f'An error occurred: {error_message_for_http}')
     
     # If it's a GET request or form is not valid
