@@ -71,9 +71,15 @@ def download_video(request):
             }
             return render(request, 'home.html', context)
         except Exception as error:
-            # Catch specific errors if possible, or provide a generic error message
-            print(f"Error during video info extraction: {error}") # Log the full error for debugging
-            return HttpResponse(f'An error occurred: {error.args[0] if error.args else "Could not extract video information. Please check the URL."}')
+            # Safely encode the error message for printing to console/logs
+            # Replaces non-ASCII characters with XML character references
+            safe_error_for_print = str(error).encode('ascii', 'xmlcharrefreplace').decode('ascii')
+            print(f"Error during video info extraction: {safe_error_for_print}") # Log the full error for debugging
+
+            # Safely encode the error message for HttpResponse
+            # Replaces non-ASCII characters with XML character references
+            error_message_for_http = str(error.args[0]).encode('ascii', 'xmlcharrefreplace').decode('ascii') if error.args else "Could not extract video information. Please check the URL."
+            return HttpResponse(f'An error occurred: {error_message_for_http}')
     
     # If it's a GET request or form is not valid
     return render(request, 'home.html', {'form': form})
