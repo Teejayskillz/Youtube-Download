@@ -23,6 +23,10 @@ def download_video(request):
             'simulate': True, # Do not actually download, just extract info
             'retries': 5, # Number of retries for network errors
             'force_ipv4': True, # Force IPv4 to avoid potential IPv6 issues
+            # Add a common user-agent to mimic a browser
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            # Add a referer header
+            'referer': 'https://www.youtube.com/',
         }
         
         try:
@@ -85,7 +89,7 @@ def download_video(request):
                 user_friendly_message = "Could not extract video information. Please check the URL or try again later."
             
             # Safely encode the user-friendly message for HttpResponse
-            error_message_for_http = user_friendly_message.encode('ascii', 'xmlcharrefreplace').decode('ascii')
+            error_message_for_http = str(user_friendly_message).encode('ascii', 'xmlcharrefreplace').decode('ascii')
             return HttpResponse(f'An error occurred: {error_message_for_http}')
     
     # If it's a GET request or form is not valid
