@@ -27,6 +27,9 @@ def download_video(request):
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
             # Add a referer header
             'referer': 'https://www.youtube.com/',
+            # Bypass geographic restrictions by faking a country code (e.g., 'US')
+            # This can sometimes help with access issues, though not directly for bot detection
+            'geo_bypass_country': 'US', 
         }
         
         try:
